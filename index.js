@@ -23,6 +23,8 @@ var PATTERN_COMBO_URL = /^(\/.*?)\?\?(.*?)(\?.*)?$/,
         'text/css'                 : TPL_CSS_MAP
     };
 
+var Path = require('path');
+
 /**
  * Parse combo-style URL.
  * @param url {string}
@@ -65,6 +67,16 @@ function loader(req, res, path, options, callback) {
         });
     }
 
+    var mimeType = '';
+
+    var extName = Path.extname(path);
+
+    if(extName === '.js') {
+        mimeType = 'application/javascript';
+    } else if(extName === '.css') {
+        mimeType = 'text/css';
+    }
+
     req.url(path)(function (err) {
         if (err) {
             callback(err);
@@ -76,7 +88,7 @@ function loader(req, res, path, options, callback) {
                 callback(null, {
                     path: req.path,
                     data: '',
-                    mime: res.type() || 'text/plain',
+                    mime: res.type() || mimeType || 'text/plain',
                     mtime: new Date(res.head('last-modified') || Date.now()).getTime()
                 });
             } else {
